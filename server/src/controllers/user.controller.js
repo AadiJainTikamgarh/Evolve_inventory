@@ -1,7 +1,6 @@
 import { registerUserService,loginUserService,getAllUsersService } from "../services/user.services.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-import { asyncHandler } from "../utils/asyncHandler.js";
 
 
 export const registerUser = asyncHandler(async (req, res) => {
