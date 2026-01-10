@@ -1,10 +1,13 @@
-import { registerUserService,loginUserService,getAllUsersService } from "../services/user.services.js";
+import {
+  registerUserService,
+  loginUserService,
+  getAllUsersService,
+} from "../services/user.services.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-
+import { asyncHandler } from "../utils/asyncHandler.js";
 
 export const registerUser = asyncHandler(async (req, res) => {
-
   if (
     [req.body.name, req.body.email, req.body.password].some(
       (field) => field?.trim() === ""
@@ -20,7 +23,6 @@ export const registerUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, user, "User registered successfully"));
 });
 
-
 export const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
@@ -31,7 +33,7 @@ export const loginUser = asyncHandler(async (req, res) => {
   const { user, token } = await loginUserService(email, password);
   const options = {
     httpOnly: true,
-    secure: true, 
+    secure: true,
   };
 
   return res
@@ -41,17 +43,15 @@ export const loginUser = asyncHandler(async (req, res) => {
 });
 
 export const logoutUser = asyncHandler(async (req, res) => {
-    const options = {
-        httpOnly: true,
-        secure: true 
-    };
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
 
-    return res
-        .status(200)
-        .clearCookie("accessToken", options)
-        .json(
-            new ApiResponse(200, {}, "User logged out successfully")
-        );
+  return res
+    .status(200)
+    .clearCookie("accessToken", options)
+    .json(new ApiResponse(200, {}, "User logged out successfully"));
 });
 
 export const getAllUsers = asyncHandler(async (req, res) => {
