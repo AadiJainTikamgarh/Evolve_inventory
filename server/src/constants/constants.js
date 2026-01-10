@@ -20,7 +20,7 @@ export const userRole = {
   USER: "user",
 };
 
-export const categories = {
+export const componentCategory = {
   MICRO_CONTROLLER: "micro_controller",
   SENSOR: "sensor",
   ACTUATOR: "actuator",
