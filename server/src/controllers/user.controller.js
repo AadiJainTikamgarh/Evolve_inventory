@@ -1,0 +1,50 @@
+import { registerUserService,loginUserService,getAllUsersService } from "../services/user.services.js";
+import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
+
+
+export const registerUser = asyncHandler(async (req, res) => {
+
+  if (
+    [req.body.name, req.body.email, req.body.password].some(
+      (field) => field?.trim() === ""
+    )
+  ) {
+    throw new ApiError(400, "All fields are required");
+  }
+
+  const user = await registerUserService(req.body);
+
+  return res
+    .status(201)
+    .json(new ApiResponse(201, user, "User registered successfully"));
+});
+
+
+export const loginUser = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    throw new ApiError(400, "Email and password are required");
+  }
+
+  const { user, token } = await loginUserService(email, password);
+  const options = {
+    httpOnly: true,
+    secure: true, 
+  };
+
+  return res
+    .status(200)
+    .cookie("accessToken", token, options) // Optional: Set cookie
+    .json(new ApiResponse(200, { user, token }, "User logged In Successfully"));
+});
+
+
+export const getAllUsers = asyncHandler(async (req, res) => {
+  const users = await getAllUsersService();
+  return res
+    .status(200)
+    .json(new ApiResponse(200, users, "Users fetched successfully"));
+});
