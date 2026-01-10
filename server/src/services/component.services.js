@@ -1,5 +1,5 @@
-import Components from "../models/Component";
-import { ApiError } from "../utils/ApiError";
+import Components from "../models/Component.js";
+import { ApiError } from "../utils/ApiError.js";
 
 const createComponentService = async (
   name,

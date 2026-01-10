@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { logStatus } from "../constants/constants";
+import { logStatus } from "../constants/constants.js";
 
 const logSchema = new mongoose.Schema(
     {

@@ -1,12 +1,12 @@
 const mongoose = require("mongoose");
-import { requestStatus } from "../constants/constants";
+import { requestStatus } from "../constants/constants.js";
 
 const requestSchema = new mongoose.Schema(
   {
     component: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "components",
-      required: true,
+      required: true, 
       index: true,
     },
     user: {

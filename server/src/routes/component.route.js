@@ -4,7 +4,7 @@ import {
   deleteComponent,
   getComponentById,
   updateComponent,
-} from "../controllers/component.controller";
+} from "../controllers/component.controller.js";
 
 const router = Router();
 

@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { componentStatus, componentCategory } from "../constants/constants";
+import { componentStatus, componentCategory } from "../constants/constants.js";
 
 const propsSchema = new mongoose.Schema({
   quantity_in_stock: {
