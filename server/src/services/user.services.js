@@ -1,18 +1,18 @@
-import { Users } from "../models/user.model.js";
+import { Users } from "./user.model.js";
 import { userRole } from "../constants/constants.js";
+import { ApiError } from "../utils/ApiError.js"; // Adjust path as needed
 import jwt from "jsonwebtoken";
 
-const MANAGER = ["manager@example.com"];
+const MANAGER = ["manager@example.com", "admin@team.com"];
 
 export const registerUserService = async (userData) => {
   const { name, email, password } = userData;
 
   const existingUser = await Users.findOne({ email });
   if (existingUser) {
-    throw new Error("User already exists with this email.");
+    throw new ApiError(409, "User already exists with this email");
   }
 
-  // If manager email then role is manager else User
   const assignedRole = MANAGER.includes(email)
     ? userRole.MANAGER
     : userRole.USER;
@@ -20,27 +20,28 @@ export const registerUserService = async (userData) => {
   const newUser = await Users.create({
     name,
     email,
-    password, // passwrod hashing in model
+    password,
     role: assignedRole,
   });
 
-  // Return user
-  const userResponse = newUser.toObject();
-  delete userResponse.password;
+  const createdUser = await Users.findById(newUser._id).select("-password");
 
-  return userResponse;
+  if (!createdUser) {
+    throw new ApiError(500, "Something went wrong while registering the user");
+  }
+
+  return createdUser;
 };
-
 
 export const loginUserService = async (email, password) => {
   const user = await Users.findOne({ email });
   if (!user) {
-    throw new Error("Invalid email or password.");
+    throw new ApiError(404, "User does not exist");
   }
 
   const isPasswordCorrect = await user.comparePassword(password);
   if (!isPasswordCorrect) {
-    throw new Error("Invalid email or password.");
+    throw new ApiError(401, "Invalid user credentials");
   }
 
   const token = jwt.sign(
@@ -48,9 +49,10 @@ export const loginUserService = async (email, password) => {
     process.env.JWT_SECRET || "secret_key",
     { expiresIn: process.env.JWT_EXPIRES_IN || "1d" }
   );
-  return { user, token };
-};
 
+  const loggedInUser = await Users.findById(user._id).select("-password");
+  return { user: loggedInUser, token };
+};
 
 export const getAllUsersService = async () => {
   return await Users.find({}).select("-password");
