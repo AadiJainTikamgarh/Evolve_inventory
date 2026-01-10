@@ -1,0 +1,23 @@
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import errorHandler from "./middleware/errorHandler.middleware";
+
+const app = express();
+
+app.use(cookieParser());
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN || ["http://localhost:5173"],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+app.use(express.static("public"));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true, limit: "16kb" }));
+
+app.use(errorHandler);
+
+export default app;
