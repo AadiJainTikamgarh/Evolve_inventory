@@ -1,15 +1,17 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "main": "index.js",
   "scripts": {
-    "build": "nodemon index.js"
+    "dev": "nodemon src/server.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "mongoose": "^9.1.2",
