@@ -2,6 +2,7 @@ import { Users } from "./user.model.js";
 import { userRole } from "../constants/constants.js";
 import { ApiError } from "../utils/ApiError.js"; // Adjust path as needed
 import jwt from "jsonwebtoken";
+import { Wishlists } from "../models/wishlist.model.js";
 
 const MANAGER = ["manager@example.com", "admin@team.com"];
 
@@ -11,6 +12,12 @@ export const registerUserService = async (userData) => {
   const existingUser = await Users.findOne({ email });
   if (existingUser) {
     throw new ApiError(409, "User already exists with this email");
+  }
+
+  const validUser = await Wishlists.findOne({ email });
+
+  if (!validUser) {
+    throw new ApiError(409, "Invalid user, Contact administration");
   }
 
   const assignedRole = MANAGER.includes(email)
