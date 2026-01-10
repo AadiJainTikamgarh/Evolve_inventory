@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { componentStatus } from "../constants/constants";
+import { componentStatus, componentCategory } from "../constants/constants";
 
 const propsSchema = new mongoose.Schema({
   quantity_in_stock: {
@@ -36,6 +36,7 @@ const componentSchema = new mongoose.Schema(
     props: {
       type: [propsSchema],
       required: true,
+      default: [],
     },
     remark: {
       type: String,
@@ -43,9 +44,9 @@ const componentSchema = new mongoose.Schema(
       default: "",
     },
     category: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "categories",
+      type: String,
       required: true,
+      enum: Object.values(componentCategory),
     },
     total_quantity: {
       type: Number,
