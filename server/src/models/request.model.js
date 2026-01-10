@@ -1,16 +1,17 @@
 const mongoose = require("mongoose");
+import { requestStatus } from "../constants/constants";
 
 const requestSchema = new mongoose.Schema(
   {
     component: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Component",
+      ref: "components",
       required: true,
       index: true,
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: "users",
       required: true,
       index: true,
     },
@@ -19,17 +20,21 @@ const requestSchema = new mongoose.Schema(
       trim: true,
       default: "",
     },
-    props: {
-      type: mongoose.Schema.Types.Mixed,
-      default: {},
+    quantity: {
+      type: Number,
+      required: true,
     },
     status: {
       type: String,
-      enum: ["PENDING", "APPROVED", "REJECTED"],
-      default: "PENDING",
+      enum: [
+        requestStatus.PENDING,
+        requestStatus.APPROVED,
+        requestStatus.REJECTED,
+      ],
+      default: requestStatus.PENDING,
     },
   },
   { timestamps: true }
 );
 
-export const Request = mongoose.model("Request", requestSchema);
+export const Requests = mongoose.model("requests", requestSchema);
