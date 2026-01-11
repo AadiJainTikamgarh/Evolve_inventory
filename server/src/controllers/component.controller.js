@@ -8,7 +8,7 @@ import {
   getComponentWithCategoryService,
   autocompleteComponentsService,
   searchComponentsWithPaginationService,
-} from "../services/component.services";
+} from "../services/component.services.js";
 
 const createComponent = asyncHandler(async (req, res) => {
   const { name, image, description, remark, props, category } = req.body;

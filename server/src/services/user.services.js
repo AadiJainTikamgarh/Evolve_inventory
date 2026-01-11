@@ -1,4 +1,4 @@
-import Users from "../models/user.model.js";
+import { Users } from "../models/user.model.js";
 import { userRole } from "../constants/constants.js";
 import { ApiError } from "../utils/ApiError.js";
 import jwt from "jsonwebtoken";
@@ -61,19 +61,6 @@ export const loginUserService = async (email, password) => {
   return { user: loggedInUser, token };
 };
 
-export const logoutUser = asyncHandler(async (req, res) => {
-    const options = {
-        httpOnly: true,
-        secure: true
-    };
-
-    return res
-        .status(200)
-        .clearCookie("accessToken", options)
-        .json(
-            new ApiResponse(200, {}, "User logged out successfully")
-        );
-});
 
 export const getAllUsersService = async () => {
   return await Users.find({}).select("-password");
