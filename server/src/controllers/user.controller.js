@@ -17,7 +17,8 @@ export const registerUser = asyncHandler(async (req, res) => {
   }
 
   const user = await registerUserService(req.body);
-
+  console.log("user registered successfully");
+  
   return res
     .status(201)
     .json(new ApiResponse(201, user, "User registered successfully"));

@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 import Components from "../models/component.model.js";
-=======
-import Components from "../models/Component.js";
->>>>>>> 6c508029678b2d0e26e8bebf5af2801c8a33bb15
 import { ApiError } from "../utils/ApiError.js";
 
 const createComponentService = async (

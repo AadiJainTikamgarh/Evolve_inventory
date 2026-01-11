@@ -56,7 +56,8 @@ export const loginUserService = async (email, password) => {
     process.env.JWT_SECRET || "secret_key",
     { expiresIn: process.env.JWT_EXPIRES_IN || "1d" }
   );
-
+  console.log("login successfully done");
+  
   const loggedInUser = await Users.findById(user._id).select("-password");
   return { user: loggedInUser, token };
 };
