@@ -4,14 +4,19 @@ import {
   deleteComponent,
   getComponentById,
   updateComponent,
+  getComponentWithCategory,
+  autocompleteComponents,
+  searchComponentsWithPagination,
 } from "../controllers/component.controller.js";
 
 const router = Router();
 
 router.post("/create", createComponent);
-router.put("/update/:id", updateComponent);
+router.put("/update", updateComponent);
 router.delete("/:id", deleteComponent);
-router.get("/:id", getComponentById);
 router.get("/category", getComponentWithCategory);
 router.get("/autocomplete", autocompleteComponents);
 router.get("/search", searchComponentsWithPagination);
+router.get("/:id", getComponentById);
+
+export default router;
