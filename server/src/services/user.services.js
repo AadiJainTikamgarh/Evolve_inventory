@@ -1,4 +1,4 @@
-import { Users } from "./user.model.js";
+import Users from "../models/user.model.js";
 import { userRole } from "../constants/constants.js";
 import { ApiError } from "../utils/ApiError.js";
 import jwt from "jsonwebtoken";
