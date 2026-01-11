@@ -19,6 +19,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 
 //import routes
+<<<<<<< HEAD
+import userRouter from "../src/routes/user.route.js";
+import healthCheckRoute from "../src/routes/healthCheck.route.js";
+=======
 import userRouter from "./routes/user.route.js";
 import healthCheckRoute from "./routes/healthCheck.route.js";
 import componentRouter from "./routes/component.route.js";
