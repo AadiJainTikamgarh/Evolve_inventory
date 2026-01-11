@@ -1,4 +1,5 @@
-import Components from "../models/component.model.js";
+import { componentCategory } from "../constants/constants.js";
+import { Components } from "../models/component.model.js";
 import { ApiError } from "../utils/ApiError.js";
 
 const createComponentService = async (
@@ -12,23 +13,23 @@ const createComponentService = async (
   if (
     !name ||
     !image ||
-    !description ||
-    !props.length ||
-    !remark ||
-    !category
+    !category ||
+    !Array.isArray(props) ||
+    props.length === 0
   ) {
-    throw new Error("All fields are required");
+    throw new ApiError(404, "Required fields are missing or invalid");
   }
 
   const component = await Components.create({
     name,
     image,
-    description,
+    description: description ?? "",
     props,
-    remark,
+    remark: remark ?? "",
     category,
   });
 
+  console.log(component);
   return component;
 };
 
@@ -37,16 +38,16 @@ const updateComponentService = async (id, props, remark) => {
     throw new ApiError(404, "All fields are required");
   }
 
-  const component = await Components.findByIdAndUpdate(
-    id,
-    {
-      props,
-      remark,
-    },
-    { new: true }
-  );
+  const component = await Components.findById(id);
 
-  return component;
+  component.props = props;
+  component.remark = remark;
+
+  await component.save({ validateBeforeSave: false });
+
+  const updatedComponent = await Components.findById(id);
+
+  return updatedComponent;
 };
 
 const deleteComponentService = async (id) => {
@@ -58,7 +59,7 @@ const deleteComponentService = async (id) => {
 };
 
 const getComponentWithCategoryService = async (category) => {
-  if (!category.include([Object.values(componentCategory)])) {
+  if (!Object.values(componentCategory).includes(category)) {
     throw new ApiError(404, "Invalid category");
   }
 
@@ -67,7 +68,7 @@ const getComponentWithCategoryService = async (category) => {
   return components;
 };
 
-const autocompleteComponentsService = async ({ query, limit = 5 }) => {
+const autocompleteComponentsService = async (query, limit = 5) => {
   if (!query) {
     throw new ApiError(404, "Query is required");
   }
@@ -90,11 +91,11 @@ const autocompleteComponentsService = async ({ query, limit = 5 }) => {
   return result;
 };
 
-const searchComponentsWithPaginationService = async ({
+const searchComponentsWithPaginationService = async (
   query,
   page = 1,
-  limit = 10,
-}) => {
+  limit = 10
+) => {
   if (!query) {
     throw new ApiError(404, "Query is required");
   }

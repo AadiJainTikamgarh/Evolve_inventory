@@ -12,16 +12,18 @@ import {
 
 const createComponent = asyncHandler(async (req, res) => {
   const { name, image, description, remark, props, category } = req.body;
+  // console.log(req.body);
 
   const component = await createComponentService(
     name,
     image,
     description,
-    remark,
     props,
+    remark,
     category
   );
 
+  console.log(component);
   return res
     .status(201)
     .json(new ApiResponse(201, component, "Component created successfully"));
@@ -59,6 +61,7 @@ const getComponentById = asyncHandler(async (req, res) => {
 
 const getComponentWithCategory = asyncHandler(async (req, res) => {
   const { category } = req.query;
+  console.log(category);
 
   const component = await getComponentWithCategoryService(category);
 

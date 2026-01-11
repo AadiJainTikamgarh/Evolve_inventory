@@ -56,20 +56,19 @@ const componentSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-componentSchema.pre("save", function (next) {
-  if (this.isModified("props")) {
-    this.total_quantity = this.props.reduce(
-      (acc, prop) => acc + prop.quantity_in_stock,
-      0
-    );
+componentSchema.pre("save", function () {
+  this.total_quantity = 0;
+  console.log(this.props);
+  for (let i = 0; i < this.props.length; i++) {
+    console.log(this.props[i].quantity_in_stock);
+    this.total_quantity += this.props[i].quantity_in_stock;
   }
-  next();
 });
 
-componentSchema.pre("deleteOne", function (next) {
-  this.model("logs").deleteMany({ component: this._id }, next);
-  this.model("requests").deleteMany({ component: this._id }, next);
-  next();
+componentSchema.post("deleteOne", function () {
+  console.log(this._id);
+  this.model("logs").deleteMany({ component: this._id });
+  this.model("requests").deleteMany({ component: this._id });
 });
 
 export const Components = mongoose.model("components", componentSchema);

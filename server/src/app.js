@@ -18,14 +18,14 @@ app.use(express.static("public"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 
-
 //import routes
 import userRouter from "./routes/user.route.js";
 import healthCheckRoute from "./routes/healthCheck.route.js";
-
+import componentRouter from "./routes/component.route.js";
 //use routes
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/health-check", healthCheckRoute);
+app.use("/api/v1/component", componentRouter);
 
 app.use(errorHandler);
 
