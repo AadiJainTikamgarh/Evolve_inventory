@@ -7,6 +7,7 @@ import {
   getComponentWithCategory,
   autocompleteComponents,
   searchComponentsWithPagination,
+  getAllComponentsWithPagination,
 } from "../controllers/component.controller.js";
 
 const router = Router();

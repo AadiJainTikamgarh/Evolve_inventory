@@ -20,7 +20,7 @@ export default function Layout({ userRole = "admin" }) {
       name: "Add Component",
       path: "/add-component",
       icon: PackagePlus,
-      roles: ["admin"],
+      roles: ["admin", "user"],
     },
     {
       name: "Borrow Component",

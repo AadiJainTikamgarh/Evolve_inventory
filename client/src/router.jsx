@@ -2,14 +2,13 @@ import { createBrowserRouter } from "react-router-dom";
 import Layout from "./components/Layout";
 import AddComponent from "./components/AddComponent";
 import LabOverview from "./pages/LabOverview";
+import Inventory from "./pages/Inventory";
 
 
 const Dashboard = () => (
   <div className="p-6 bg-white rounded-lg border">Dashboard Metrics</div>
 );
-const Inventory = () => (
-  <div className="p-6 bg-white rounded-lg border">Inventory Data Grid</div>
-);
+
 const Settings = () => (
   <div className="p-6 bg-white rounded-lg border">System Settings</div>
 );
