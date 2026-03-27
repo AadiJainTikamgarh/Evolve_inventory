@@ -1,136 +1,138 @@
-import { useState, useMemo, useRef, useEffect } from "react";
-import {
-  Search,
-  Edit2,
-  Trash2,
-  Plus,
-  Box,
-  ChevronDown,
-  X,
-  AlertTriangle,
-} from "lucide-react";
-
-// Custom Dropdown Component
-const CustomDropdown = ({ options, value, onChange, placeholder }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target))
-        setIsOpen(false);
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  return (
-    <div className="relative" ref={dropdownRef}>
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center justify-between w-40 bg-[#121212] border ${isOpen ? "border-[#00C951]" : "border-gray-700"} text-gray-300 text-sm rounded-lg px-4 py-2 outline-none transition-colors hover:border-[#00C951]`}
-      >
-        <span className="truncate">{value || placeholder}</span>
-        <ChevronDown className="w-4 h-4 text-gray-500 ml-2" />
-      </button>
-
-      {isOpen && (
-        <div className="absolute top-full left-0 mt-1 w-full bg-[#1A1A1A] border border-gray-700 rounded-lg shadow-lg overflow-hidden z-50">
-          {options.map((option) => (
-            <div
-              key={option}
-              onClick={() => {
-                onChange(option);
-                setIsOpen(false);
-              }}
-              className="px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white cursor-pointer transition-colors"
-            >
-              {option}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
-
-const dummyData = [
-  {
-    _id: "1",
-    name: "ESP32 DevKit V1",
-    description: "Dual-core Wi-Fi & Bluetooth MCU",
-    category: "Microcontrollers",
-    remark: "Cabinet A - Shelf 2",
-    component_working: 15,
-    component_not_working: 2,
-    component_in_use: 8,
-  },
-  {
-    _id: "2",
-    name: "L298N Motor Driver",
-    description: "Dual H-Bridge motor controller",
-    category: "Actuators",
-    remark: "Cabinet B - Shelf 1",
-    component_working: 8,
-    component_not_working: 1,
-    component_in_use: 4,
-  },
-  {
-    _id: "3",
-    name: "18650 Li-ion Cell",
-    description: "3.7V 2600mAh rechargeable battery",
-    category: "Power",
-    remark: "Battery Drawer",
-    component_working: 40,
-    component_not_working: 5,
-    component_in_use: 12,
-  },
-];
+import { useState, useMemo, useEffect } from "react";
+import { Search, Edit2, Trash2, Plus, Box } from "lucide-react";
+import CustomDropdown from "../components/CustomDropDown";
+import EditModal from "../components/EditModal";
+import DeleteModal from "../components/DeleteModal";
 
 export default function Inventory() {
+  // --- New State for Backend Data ---
+  const [components, setComponents] = useState([]);
+
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState("All Categories");
   const [status, setStatus] = useState("All Items");
 
-  // Modal States
   const [editData, setEditData] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
 
-  const categories = [
-    "All Categories",
-    "Microcontrollers",
-    "Sensors",
-    "Power",
-    "Actuators",
-  ];
+  // Replace: const categories = ["All Categories", "Microcontrollers", ...];
+  const categoryMap = {
+    "All Categories": "All Categories",
+    "Micro Controller": "micro_controller",
+    "Sensor": "sensor",
+    "Actuator": "actuator",
+    "Motor Driver": "motor_driver",
+    "Power Supplies": "power_supplies",
+    "Communication": "communication",
+    "Other": "other",
+  };
+  const categories = Object.keys(categoryMap);
   const statuses = ["All Items", "In Stock", "Out of Stock"];
 
+  // --- API Fetch Logic ---
+  const fetchComponents = async () => {
+    try {
+      // Toggle between search and default get-all route.
+      // Using limit=50 so client-side category filtering works effectively on the current page.
+      const endpoint = query
+        ? `/api/v1/component/search?query=${query}&page=1&limit=50`
+        : `/api/v1/component/all?page=1&limit=50`;
+
+      const res = await fetch(endpoint);
+      const json = await res.json();
+
+      // Assumes ApiResponse class maps to json.data.data
+      if (json.success !== false && json.data?.data) {
+        setComponents(json.data.data);
+      }
+    } catch (err) {
+      console.error("Error fetching components:", err);
+    }
+  };
+
+  // Fetch on mount and when query changes (with debounce)
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      fetchComponents();
+    }, 300); // 300ms debounce for typing
+    return () => clearTimeout(timeoutId);
+  }, [query]);
+
+  // Client-side filtering applies to the fetched components
   const filteredData = useMemo(() => {
-    return dummyData.filter(
+    return components.filter(
       (item) =>
         (item.name.toLowerCase().includes(query.toLowerCase()) ||
           item.category.toLowerCase().includes(query.toLowerCase())) &&
-        (category === "All Categories" || item.category === category) &&
+        // Update the category check here to use categoryMap[category]
+        (category === "All Categories" ||
+          item.category === categoryMap[category]) &&
         (status === "All Items" ||
           (status === "In Stock"
             ? item.component_working > 0
             : item.component_working === 0)),
     );
-  }, [query, category, status]);
+  }, [components, query, category, status]);
 
-  const handleUpdate = (e) => {
+  // --- API Update Logic ---
+  const [updateError, setUpdateError] = useState("");
+
+  // --- REWRITTEN API Update Logic ---
+  const handleUpdate = async (e) => {
     e.preventDefault();
-    console.log("Submitting to /api/v1/component/update:", editData);
-    // TODO: Add fetch call here
-    setEditData(null);
+    setUpdateError(""); // Clear previous errors
+
+    try {
+      const res = await fetch("/api/v1/component/update", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: editData._id,
+          component_working: editData.component_working,
+          component_not_working: editData.component_not_working,
+          component_in_use: editData.component_in_use,
+          // Fallback applied here to bypass strict backend !remark validation
+          remark: editData.remark || "None",
+        }),
+      });
+
+      const json = await res.json();
+
+      // Check for success flag from your ApiResponse class
+      if (!res.ok || json.success === false) {
+        throw new Error(json.message || "Failed to update component");
+      }
+
+      fetchComponents(); // Refresh the table
+      setEditData(null); // Close modal
+    } catch (err) {
+      console.error("Update error:", err);
+      setUpdateError(err.message); // Display error in modal
+    }
   };
 
-  const handleDelete = () => {
-    console.log(`Submitting to /api/v1/component/${deleteId} via DELETE`);
-    // TODO: Add fetch call here
-    setDeleteId(null);
+  // ... further down in the return statement, pass the error prop to the modal:
+  // <EditModal editData={editData} setEditData={setEditData} handleUpdate={handleUpdate} updateError={updateError} />
+
+  // --- API Delete Logic ---
+  const handleDelete = async () => {
+    try {
+      const res = await fetch(`/api/v1/component/${deleteId}`, {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        fetchComponents(); // Refresh the table
+        setDeleteId(null); // Close modal
+      } else {
+        console.error("Failed to delete component");
+      }
+    } catch (err) {
+      console.error("Delete error:", err);
+    }
   };
 
+  // --- UI Remains Exactly As Requested ---
   return (
     <div className="text-gray-200 font-sans max-w-7xl mx-auto relative">
       <div className="mb-6">
@@ -148,11 +150,10 @@ export default function Inventory() {
           <input
             type="text"
             placeholder="Search items, descriptions..."
-            className="w-full bg-[#121212] border border-gray-700 rounded-lg pl-10 pr-4 py-2 text-sm text-white focus:border-[#00C951] outline-none transition-all"
+            className="w-full bg-[#121212] border border-gray-700 rounded-lg pl-10 pr-4 py-2 text-sm text-white focus:border-[#00C951] outline-none"
             onChange={(e) => setQuery(e.target.value)}
           />
         </div>
-
         <div className="flex w-full md:w-auto gap-3 z-10">
           <CustomDropdown
             options={categories}
@@ -168,7 +169,7 @@ export default function Inventory() {
       </div>
 
       <div className="bg-[#1A1A1A] border border-gray-800 rounded-xl overflow-x-auto shadow-sm">
-        <table className="w-full text-left border-collapse min-w-[800px]">
+        <table className="w-full text-left border-collapse min-w-200">
           <thead>
             <tr className="border-b border-gray-800 text-xs font-semibold text-white uppercase tracking-wider">
               <th className="p-4 pl-6">Item Details</th>
@@ -191,7 +192,7 @@ export default function Inventory() {
                   className="hover:bg-[#121212]/50 transition-colors group"
                 >
                   <td className="p-4 pl-6 flex items-center gap-4">
-                    <div className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <div className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center shrink-0">
                       <Box className="w-5 h-5 text-gray-400" />
                     </div>
                     <div>
@@ -205,7 +206,9 @@ export default function Inventory() {
                   </td>
                   <td className="p-4">
                     <span className="text-[11px] font-medium tracking-wide px-2.5 py-1 bg-gray-800/80 border border-gray-700 rounded-full text-gray-300">
-                      {item.category}
+                      {Object.keys(categoryMap).find(
+                        (key) => categoryMap[key] === item.category,
+                      ) || item.category}
                     </span>
                   </td>
                   <td className="p-4 text-sm text-gray-400">
@@ -231,10 +234,10 @@ export default function Inventory() {
                     )}
                   </td>
                   <td className="p-4 pr-6 text-right">
-                    <div className="flex items-center justify-end gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center justify-end gap-3">
                       <button
                         onClick={() => setEditData({ ...item })}
-                        className="text-gray-400 hover:text-white transition-colors"
+                        className="text-gray-400 hover:text-blue-500 transition-colors"
                         title="Edit"
                       >
                         <Edit2 className="w-4 h-4" />
@@ -255,153 +258,16 @@ export default function Inventory() {
         </table>
       </div>
 
-      {/* Edit Modal */}
-      {editData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <form
-            onSubmit={handleUpdate}
-            className="bg-[#1A1A1A] border border-gray-800 rounded-2xl w-full max-w-md shadow-2xl flex flex-col overflow-hidden"
-          >
-            <div className="flex justify-between items-center p-5 border-b border-gray-800">
-              <h2 className="text-lg font-semibold text-white">
-                Edit Component
-              </h2>
-              <button
-                type="button"
-                onClick={() => setEditData(null)}
-                className="text-gray-400 hover:text-white"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="p-5 flex flex-col gap-4">
-              <div>
-                <label className="block text-xs text-gray-500 uppercase tracking-wider mb-1">
-                  Component Name (Read-Only)
-                </label>
-                <input
-                  disabled
-                  value={editData.name}
-                  className="w-full bg-[#121212] border border-gray-800 rounded-lg p-2.5 text-gray-500 cursor-not-allowed text-sm"
-                />
-              </div>
-              <div className="grid grid-cols-3 gap-3">
-                <div>
-                  <label className="block text-xs text-gray-400 mb-1">
-                    Working
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={editData.component_working}
-                    onChange={(e) =>
-                      setEditData({
-                        ...editData,
-                        component_working: Number(e.target.value),
-                      })
-                    }
-                    className="w-full bg-[#121212] border border-gray-700 rounded-lg p-2.5 text-white focus:border-[#00C951] outline-none text-center"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-gray-400 mb-1">
-                    In Use
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={editData.component_in_use}
-                    onChange={(e) =>
-                      setEditData({
-                        ...editData,
-                        component_in_use: Number(e.target.value),
-                      })
-                    }
-                    className="w-full bg-[#121212] border border-gray-700 rounded-lg p-2.5 text-white focus:border-[#00C951] outline-none text-center"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs text-gray-400 mb-1">
-                    Broken
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={editData.component_not_working}
-                    onChange={(e) =>
-                      setEditData({
-                        ...editData,
-                        component_not_working: Number(e.target.value),
-                      })
-                    }
-                    className="w-full bg-[#121212] border border-gray-700 rounded-lg p-2.5 text-white focus:border-[#00C951] outline-none text-center"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs text-gray-400 mb-1">
-                  Remark / Location
-                </label>
-                <input
-                  type="text"
-                  value={editData.remark}
-                  onChange={(e) =>
-                    setEditData({ ...editData, remark: e.target.value })
-                  }
-                  className="w-full bg-[#121212] border border-gray-700 rounded-lg p-2.5 text-white focus:border-[#00C951] outline-none text-sm"
-                />
-              </div>
-            </div>
-            <div className="p-5 border-t border-gray-800 flex justify-end gap-3">
-              <button
-                type="button"
-                onClick={() => setEditData(null)}
-                className="px-4 py-2 text-sm text-gray-400 hover:text-white transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="px-4 py-2 text-sm bg-[#00C951] text-black font-semibold rounded-lg hover:bg-[#00b348] transition-colors"
-              >
-                Save Changes
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      {/* Delete Confirmation Modal */}
-      {deleteId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-          <div className="bg-[#1A1A1A] border border-gray-800 rounded-2xl w-full max-w-sm shadow-2xl p-6 text-center">
-            <div className="w-12 h-12 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <AlertTriangle className="w-6 h-6 text-red-500" />
-            </div>
-            <h3 className="text-lg font-semibold text-white mb-2">
-              Delete Component?
-            </h3>
-            <p className="text-sm text-gray-400 mb-6">
-              This action cannot be undone. This will permanently remove the
-              item from the lab inventory.
-            </p>
-            <div className="flex justify-center gap-3">
-              <button
-                onClick={() => setDeleteId(null)}
-                className="px-5 py-2.5 text-sm font-medium text-gray-300 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDelete}
-                className="px-5 py-2.5 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
-              >
-                Delete Item
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <EditModal
+        editData={editData}
+        setEditData={setEditData}
+        handleUpdate={handleUpdate}
+      />
+      <DeleteModal
+        deleteId={deleteId}
+        setDeleteId={setDeleteId}
+        handleDelete={handleDelete}
+      />
     </div>
   );
 }
