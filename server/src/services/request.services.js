@@ -7,6 +7,7 @@ import { Components } from "../models/component.model.js";
 import { Logs } from "../models/log.model.js";
 import { Requests } from "../models/request.model.js";
 import { ApiError } from "../utils/ApiError.js";
+import connectDB from "../config/db.js";
 
 const createRequestService = async (
   componentId,
@@ -15,6 +16,7 @@ const createRequestService = async (
   quantity,
   type
 ) => {
+  await connectDB();
   if (
     !componentId ||
     !userId ||
@@ -45,6 +47,7 @@ const createRequestService = async (
 
 // Component Request Service
 const componentRequestService = async (reqId, status, remark) => {
+  await connectDB();
   // creating session for a transaction
   const session = await Requests.startSession();
   session.startTransaction();
@@ -115,6 +118,7 @@ const componentRequestService = async (reqId, status, remark) => {
 
 // Component Submit Service
 const componentSubmitService = async (reqId, status, type, remark, component_working, component_not_working) => {
+  await connectDB();
   if (
     !reqId ||
     !Object.values(requestStatus).includes(status) ||
@@ -198,6 +202,7 @@ const componentSubmitService = async (reqId, status, type, remark, component_wor
 
 // get all request of particular component
 const getComponentRequest = async (componentId) => {
+  await connectDB();
   if (!componentId) {
     throw new ApiError(404, "component Id not found");
   }
@@ -211,6 +216,7 @@ const getComponentRequest = async (componentId) => {
 
 // const get request by user Id and component Id
 const getReqByUsr = async (userId) => {
+  await connectDB();
   if (!userId) {
     throw new ApiError(404, "User id not found");
   }
@@ -224,6 +230,7 @@ const getReqByUsr = async (userId) => {
 
 // get request by component Id and user Id
 const getReqByComp_Usr = async (componentId, userId) => {
+  await connectDB();
   if (!componentId) {
     throw new ApiError(404, "Component id not found");
   }

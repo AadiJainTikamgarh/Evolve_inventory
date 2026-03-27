@@ -1,6 +1,7 @@
 import { componentCategory } from "../constants/constants.js";
 import { Components } from "../models/component.model.js";
 import { ApiError } from "../utils/ApiError.js";
+import connectDB from "../config/db.js";
 
 const createComponentService = async (
   name,
@@ -12,6 +13,7 @@ const createComponentService = async (
   remark,
   category
 ) => {
+  await connectDB();
   if (
     !name ||
     !image ||
@@ -39,6 +41,7 @@ const createComponentService = async (
 };
 
 const updateComponentService = async (id, component_working, component_not_working, component_in_use, remark) => {
+  await connectDB();
   if (!id || component_working === undefined || component_not_working === undefined || component_in_use === undefined || !remark) {
     throw new ApiError(404, "All fields are required");
   }
@@ -61,6 +64,7 @@ const updateComponentService = async (id, component_working, component_not_worki
 };
 
 const deleteComponentService = async (id) => {
+  await connectDB();
   if (!id) {
     throw new ApiError(400, "Id is required");
   }
@@ -74,6 +78,7 @@ const deleteComponentService = async (id) => {
 };
 
 const getComponentWithCategoryService = async (category) => {
+  await connectDB();
   if (!Object.values(componentCategory).includes(category)) {
     throw new ApiError(404, "Invalid category");
   }
@@ -84,6 +89,7 @@ const getComponentWithCategoryService = async (category) => {
 };
 
 const autocompleteComponentsService = async (query, limit = 5) => {
+  await connectDB();
   if (!query) {
     throw new ApiError(404, "Query is required");
   }
@@ -113,6 +119,7 @@ const searchComponentsWithPaginationService = async (
   page = 1,
   limit = 10
 ) => {
+  await connectDB();
   if (!query) {
     throw new ApiError(404, "Query is required");
   }
@@ -160,6 +167,7 @@ const searchComponentsWithPaginationService = async (
 };
 
 const getAllComponentsWithPaginationService = async (page = 1, limit = 10) => {
+  await connectDB();
   const parsedPage = Number(page) || 1;
   const parsedLimit = Number(limit) || 10;
   const skip = (parsedPage - 1) * parsedLimit;
@@ -178,6 +186,7 @@ const getAllComponentsWithPaginationService = async (page = 1, limit = 10) => {
 };
 
 const getComponentByIdService = async (id) => {
+  await connectDB();
   if (!id) {
     throw new ApiError(400, "Id is required");
   }

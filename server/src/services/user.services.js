@@ -3,10 +3,12 @@ import { userRole } from "../constants/constants.js";
 import { ApiError } from "../utils/ApiError.js";
 import jwt from "jsonwebtoken";
 import { Wishlists } from "../models/wishlist.model.js";
+import connectDB from "../config/db.js";
 
 const MANAGER = ["manager@example.com"];
 
 export const registerUserService = async (userData) => {
+  await connectDB();
   const { name, email, password } = userData;
 
   const existingUser = await Users.findOne({ email });
@@ -41,6 +43,7 @@ export const registerUserService = async (userData) => {
 };
 
 export const loginUserService = async (email, password) => {
+  await connectDB();
   const user = await Users.findOne({ email });
   if (!user) {
     throw new ApiError(404, "User does not exist");
@@ -64,5 +67,6 @@ export const loginUserService = async (email, password) => {
 
 
 export const getAllUsersService = async () => {
+  await connectDB();
   return await Users.find({}).select("-password");
 };
