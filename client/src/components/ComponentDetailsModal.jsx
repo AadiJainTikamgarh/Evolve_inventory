@@ -1,6 +1,6 @@
 import { X, Box, Activity, Hash, Layers, MapPin } from "lucide-react";
 
-export default function ComponentDetailsModal({ item, onClose }) {
+export default function ComponentDetailsModal({ item, onClose, onRequestClick }) {
   if (!item) return null;
 
   const totalQuantity =
@@ -128,6 +128,17 @@ export default function ComponentDetailsModal({ item, onClose }) {
                   {item.remark || "Unassigned location"}
                 </span>
               </div>
+            </div>
+
+            <div className="pt-4 border-t border-gray-800 mt-2">
+              <button
+                onClick={() => {
+                  onRequestClick();
+                }}
+                className="w-full py-3 text-sm bg-[#00C951] text-black font-semibold rounded-xl hover:bg-[#00b348] transition-colors flex items-center justify-center gap-2 shadow-lg shadow-[#00C951]/20"
+              >
+                Request / Return this Component
+              </button>
             </div>
           </div>
         </div>

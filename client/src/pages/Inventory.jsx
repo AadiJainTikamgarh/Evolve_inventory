@@ -3,6 +3,7 @@ import { Search, Edit2, Trash2, Box } from "lucide-react";
 import CustomDropdown from "../components/CustomDropDown";
 import EditModal from "../components/EditModal";
 import DeleteModal from "../components/DeleteModal";
+import BorrowModal from "../components/BorrowModal";
 import ComponentDetailsModal from "../components/ComponentDetailsModal"; 
 import { useAuth } from "../context/AuthContext";
 
@@ -19,6 +20,7 @@ export default function Inventory() {
   const [editData, setEditData] = useState(null);
   const [deleteId, setDeleteId] = useState(null);
   const [viewItem, setViewItem] = useState(null); 
+  const [isBorrowModalOpen, setIsBorrowModalOpen] = useState(false);
   const [updateError, setUpdateError] = useState("");
 
   const categoryMap = {
@@ -194,7 +196,7 @@ export default function Inventory() {
               return (
                 <tr
                   key={item._id}
-                  onClick={() => setViewItem(item)} 
+                  onClick={() => setViewItem(item)}
                   className="hover:bg-[#121212]/50 transition-colors group cursor-pointer"
                 >
                   <td className="p-3 sm:p-4 pl-4 sm:pl-6 flex items-center gap-3 sm:gap-4">
@@ -284,6 +286,18 @@ export default function Inventory() {
       <ComponentDetailsModal
         item={viewItem}
         onClose={() => setViewItem(null)}
+        onRequestClick={() => setIsBorrowModalOpen(true)}
+      />
+
+      <BorrowModal
+        isOpen={isBorrowModalOpen}
+        onClose={() => setIsBorrowModalOpen(false)}
+        component={viewItem} // Passes the item they are currently looking at
+        onSuccess={() => {
+          fetchComponents(); // Refresh table so quantities update
+          setIsBorrowModalOpen(false);
+          setViewItem(null);
+        }}
       />
 
       <EditModal

@@ -8,9 +8,9 @@ import { AuthProvider } from "./context/AuthContext";
 import Login from "./pages/Login";
 import Inventory from "./pages/Inventory";
 import LabOverview from "./pages/LabOverview";
-import BorrowComponent from "./components/BorrowDashboard";
+import BorrowWrapper from "./components/BorrowWrapper"; // <-- Changed import
 import ProtectedRoute from "./components/ProtectedRoute";
-import Layout from "./components/Layout"; 
+import Layout from "./components/Layout";
 
 export default function App() {
   return (
@@ -22,7 +22,7 @@ export default function App() {
             <Route element={<Layout />}>
               <Route path="/inventory" element={<Inventory />} />
               <Route path="/" element={<LabOverview />} />
-              <Route path="/borrow" element={<BorrowComponent />} />
+              <Route path="/borrow" element={<BorrowWrapper />} />
             </Route>
           </Route>
           <Route path="*" element={<Navigate to="/inventory" replace />} />
