@@ -16,6 +16,28 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   }, []);
 
+  // global Fetch Interceptor for 401 Expired Tokens 
+  useEffect(() => {
+    const originalFetch = window.fetch;
+
+    window.fetch = async (...args) => {
+      const response = await originalFetch(...args);
+      if (response.status === 401) {
+        console.warn("Session expired. Auto-logging out...");
+
+        setUser(null);
+        localStorage.removeItem("evolve_user");
+        window.location.href = "/login";
+      }
+
+      return response;
+    };
+
+    return () => {
+      window.fetch = originalFetch;
+    };
+  }, []); 
+
   const login = (userData) => {
     setUser(userData);
     localStorage.setItem("evolve_user", JSON.stringify(userData));

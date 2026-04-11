@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { X, ChevronDown, Upload } from "lucide-react";
+import imageCompression from "browser-image-compression";
 
 export default function AddComponentModal({ isOpen, onClose, onSuccess }) {
   const [formData, setFormData] = useState({
@@ -25,11 +26,28 @@ export default function AddComponentModal({ isOpen, onClose, onSuccess }) {
   };
 
   const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
+    let file = e.target.files[0];
     if (!file) return;
 
     setImageUploading(true);
     setError("");
+
+    //  Image Compression Logic
+    const options = {
+      maxSizeMB: 2, // Compress to max 2MB
+      maxWidthOrHeight: 1024,
+      useWebWorker: true,
+      fileType: "image/jpeg", // Convert HEIC/PNG to JPEG
+    };
+
+    try {
+      file = await imageCompression(file, options);
+    } catch (compressionError) {
+      console.error("Compression error:", compressionError);
+      setError("Failed to compress image before uploading.");
+      setImageUploading(false);
+      return;
+    }
 
     const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
     const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
@@ -119,7 +137,7 @@ export default function AddComponentModal({ isOpen, onClose, onSuccess }) {
             Add New Component
           </h2>
           <button
-            onClick={onClose}
+            onClick={handleClose}
             className="text-gray-400 hover:text-white transition-colors"
           >
             <X className="w-5 h-5" />
@@ -145,6 +163,7 @@ export default function AddComponentModal({ isOpen, onClose, onSuccess }) {
                 <input
                   name="name"
                   required
+                  value={formData.name}
                   onChange={handleChange}
                   className="w-full bg-[#121212] border border-gray-700 rounded-lg p-2.5 text-white focus:border-[#00C951] outline-none transition-all placeholder-gray-600 text-sm"
                   placeholder="e.g. ESP32 Microcontroller"
@@ -267,6 +286,7 @@ export default function AddComponentModal({ isOpen, onClose, onSuccess }) {
               </label>
               <input
                 name="remark"
+                value={formData.remark}
                 onChange={handleChange}
                 className="w-full bg-[#121212] border border-gray-700 rounded-lg p-2.5 text-white focus:border-[#00C951] outline-none transition-all placeholder-gray-600 text-sm"
                 placeholder="e.g. Cabinet A"
@@ -280,6 +300,7 @@ export default function AddComponentModal({ isOpen, onClose, onSuccess }) {
               <textarea
                 name="description"
                 rows="2"
+                value={formData.description}
                 onChange={handleChange}
                 className="w-full bg-[#121212] border border-gray-700 rounded-lg p-2.5 text-white focus:border-[#00C951] outline-none transition-all resize-none placeholder-gray-600 text-sm"
                 placeholder="Technical specifications..."
@@ -289,7 +310,7 @@ export default function AddComponentModal({ isOpen, onClose, onSuccess }) {
             <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 mt-2 pt-5 border-t border-gray-800 shrink-0">
               <button
                 type="button"
-                onClick={onClose}
+                onClick={handleClose}
                 className="w-full sm:w-auto px-4 py-2.5 sm:py-2 text-sm text-gray-400 hover:text-white transition-colors border border-gray-700 sm:border-transparent rounded-lg sm:rounded-none"
               >
                 Cancel
