@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react";
 import { CheckCircle, XCircle, Package } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 
 export default function BorrowDashboard() {
+  const { user } = useAuth();
+  const isDemo = user?.isDemo || user?.role === "demo";
   const [requests, setRequests] = useState([]);
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -209,16 +212,32 @@ export default function BorrowDashboard() {
                     <td className="p-4 pr-6 text-right">
                       <div className="flex justify-end gap-2">
                         <button
-                          onClick={() => handleProcessRequest(req, "approved")}
-                          className="p-1.5 text-gray-400 hover:text-[#00C951] hover:bg-[#00C951]/10 rounded transition-colors"
-                          title="Approve"
+                          onClick={() => {
+                            if (isDemo && !req.isDemo) return;
+                            handleProcessRequest(req, "approved");
+                          }}
+                          className={`p-1.5 transition-colors rounded ${
+                            isDemo && !req.isDemo
+                              ? "text-gray-600 cursor-not-allowed"
+                              : "text-gray-400 hover:text-[#00C951] hover:bg-[#00C951]/10"
+                          }`}
+                          title={isDemo && !req.isDemo ? "Disabled in demo mode" : "Approve"}
+                          disabled={isDemo && !req.isDemo}
                         >
                           <CheckCircle className="w-5 h-5" />
                         </button>
                         <button
-                          onClick={() => handleProcessRequest(req, "rejected")}
-                          className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-500/10 rounded transition-colors"
-                          title="Reject"
+                          onClick={() => {
+                            if (isDemo && !req.isDemo) return;
+                            handleProcessRequest(req, "rejected");
+                          }}
+                          className={`p-1.5 transition-colors rounded ${
+                            isDemo && !req.isDemo
+                              ? "text-gray-600 cursor-not-allowed"
+                              : "text-gray-400 hover:text-red-500 hover:bg-red-500/10"
+                          }`}
+                          title={isDemo && !req.isDemo ? "Disabled in demo mode" : "Reject"}
+                          disabled={isDemo && !req.isDemo}
                         >
                           <XCircle className="w-5 h-5" />
                         </button>

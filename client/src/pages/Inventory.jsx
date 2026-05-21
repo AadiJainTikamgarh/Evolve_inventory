@@ -283,16 +283,32 @@ export default function Inventory() {
                         onClick={(e) => e.stopPropagation()}
                       >
                         <button
-                          onClick={() => setEditData({ ...item })}
-                          className="text-gray-400 hover:text-[#00C951] transition-colors p-1"
-                          title="Edit"
+                          onClick={() => {
+                            if (user?.isDemo && !item.isDemo) return;
+                            setEditData({ ...item });
+                          }}
+                          className={`p-1 transition-colors ${
+                            user?.isDemo && !item.isDemo
+                              ? "text-gray-600 cursor-not-allowed"
+                              : "text-gray-400 hover:text-[#00C951]"
+                          }`}
+                          title={user?.isDemo && !item.isDemo ? "Disabled in demo mode" : "Edit"}
+                          disabled={user?.isDemo && !item.isDemo}
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => setDeleteId(item._id)}
-                          className="text-gray-400 hover:text-red-500 transition-colors p-1"
-                          title="Delete"
+                          onClick={() => {
+                            if (user?.isDemo && !item.isDemo) return;
+                            setDeleteId(item._id);
+                          }}
+                          className={`p-1 transition-colors ${
+                            user?.isDemo && !item.isDemo
+                              ? "text-gray-600 cursor-not-allowed"
+                              : "text-gray-400 hover:text-red-500"
+                          }`}
+                          title={user?.isDemo && !item.isDemo ? "Disabled in demo mode" : "Delete"}
+                          disabled={user?.isDemo && !item.isDemo}
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>

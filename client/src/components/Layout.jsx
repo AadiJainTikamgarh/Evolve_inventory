@@ -151,10 +151,20 @@ export default function Layout() {
               {user?.name}
             </span>
             <div className="text-[10px] md:text-xs font-medium text-[#00C951] bg-[#00C951]/10 px-2 md:px-3 py-1 md:py-1.5 rounded-full border border-[#00C951]/20 shrink-0">
-              {userRole.toUpperCase()}
+              {userRole.toUpperCase()} {user?.isDemo && "(DEMO)"}
             </div>
           </div>
         </header>
+
+        {user?.isDemo && (
+          <div className="bg-[#00C951]/5 border-b border-[#00C951]/15 px-4 md:px-8 py-2.5 flex items-center justify-center gap-2 text-xs md:text-sm font-semibold text-[#00C951] tracking-wide backdrop-blur-sm shrink-0">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00C951] opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-[#00C951]"></span>
+            </span>
+            You are using Demo Mode with restricted permissions
+          </div>
+        )}
 
         <div className="flex-1 p-4 md:p-8 overflow-y-auto">
           <Outlet />

@@ -38,6 +38,10 @@ const requestSchema = new mongoose.Schema(
       enum: Object.values(requestType),
       required: true,
     },
+    isDemo: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

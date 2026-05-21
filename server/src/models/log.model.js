@@ -28,6 +28,10 @@ const logSchema = new mongoose.Schema(
             type: String,
             trim: true,
             default: ""
+        },
+        isDemo: {
+            type: Boolean,
+            default: false
         }
     },
     { timestamps: true }

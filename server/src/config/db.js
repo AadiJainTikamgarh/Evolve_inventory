@@ -19,6 +19,15 @@ const MAX_RETRIES = 3;
  */
 const isConnectionHealthy = () => {
     try {
+        // If mongoose already has an active connection (e.g. in test runner), reuse it
+        if (mongoose.connection && mongoose.connection.readyState === 1) {
+            if (!cached.conn) {
+                cached.conn = mongoose;
+            }
+            console.log("✅ Connection is healthy (active readyState)");
+            return true;
+        }
+
         // Must exist
         if (!cached.conn) {
             console.log("❌ No cached connection exists");

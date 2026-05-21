@@ -10,13 +10,15 @@ import {
   getAllComponentsWithPagination,
   getLabStats,
 } from "../controllers/component.controller.js";
-import { verifyJWT, verifyManager } from "../middlewares/auth.middleware.js";
+import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { checkPermission } from "../middlewares/permission.middleware.js";
+import { sandboxComponent } from "../middlewares/sandbox.middleware.js";
 
 const router = Router();
 
-router.route("/create").post(verifyJWT, verifyManager, createComponent);
-router.route("/update").put(verifyJWT, verifyManager, updateComponent);
-router.route("/:id").delete(verifyJWT, verifyManager, deleteComponent);
+router.route("/create").post(verifyJWT, checkPermission("create"), sandboxComponent, createComponent);
+router.route("/update").put(verifyJWT, checkPermission("edit"), sandboxComponent, updateComponent);
+router.route("/:id").delete(verifyJWT, checkPermission("delete"), sandboxComponent, deleteComponent);
 router.route("/category").get(verifyJWT, getComponentWithCategory);
 router.route("/autocomplete").get(verifyJWT, autocompleteComponents);
 router.route("/all").get(verifyJWT, getAllComponentsWithPagination);

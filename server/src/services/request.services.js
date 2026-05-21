@@ -61,6 +61,12 @@ const componentRequestService = async (reqId, status, remark) => {
       throw new ApiError(404, "All fields are required");
     }
 
+    // if approved or rejected, find it first
+    const request = await Requests.findById(reqId).session(session);
+    if (!request) {
+      throw new ApiError(404, "Request not found");
+    }
+
     // checking is request rejected
     if (status == requestStatus.REJECTED) {
       await Logs.create(
@@ -78,12 +84,6 @@ const componentRequestService = async (reqId, status, remark) => {
       const deletedRequest = await Requests.findByIdAndDelete(reqId, { session });
       await session.commitTransaction();
       return deletedRequest;
-    }
-
-    // if approved, find it
-    const request = await Requests.findById(reqId).session(session);
-    if (!request) {
-      throw new ApiError(404, "Request not found");
     }
 
     const component = await Components.findById(request.component).session(session);

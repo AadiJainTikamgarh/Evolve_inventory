@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import { Lock, Mail, User as UserIcon, AlertTriangle } from "lucide-react";
+import { Lock, Mail, User as UserIcon, AlertTriangle, Key, Copy, Check, X, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function Login() {
@@ -15,6 +15,25 @@ export default function Login() {
     email: "",
     password: "",
   });
+
+  const [showDemoPopup, setShowDemoPopup] = useState(false);
+  const [copiedKey, setCopiedKey] = useState("");
+
+  const handleAutofill = (email, password) => {
+    setIsRegistering(false);
+    setFormData({
+      name: "",
+      email,
+      password,
+    });
+    setError("");
+  };
+
+  const handleCopy = (text, key) => {
+    navigator.clipboard.writeText(text);
+    setCopiedKey(key);
+    setTimeout(() => setCopiedKey(""), 2000);
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -171,6 +190,106 @@ export default function Login() {
             {isRegistering ? "Sign in here" : "Register here"}
           </button>
         </div>
+      </div>
+
+      {/* Toggleable Demo Credentials Popup */}
+      <div className="fixed bottom-6 right-6 z-50 font-sans">
+        {!showDemoPopup ? (
+          <button
+            onClick={() => setShowDemoPopup(true)}
+            className="flex items-center gap-2 bg-gradient-to-r from-[#00C951]/20 to-[#00C951]/10 border border-[#00C951]/30 hover:border-[#00C951]/60 text-white px-4 py-3 rounded-full shadow-lg hover:shadow-[#00C951]/10 hover:scale-105 transition-all duration-300 backdrop-blur-md cursor-pointer animate-pulse"
+          >
+            <Key className="w-4 h-4 text-[#00C951]" />
+            <span className="text-xs font-semibold tracking-wide">Demo Credentials</span>
+          </button>
+        ) : (
+          <div className="bg-[#1A1A1A]/95 border border-gray-800 rounded-2xl shadow-2xl w-80 p-5 backdrop-blur-md transition-all duration-300 transform scale-100 origin-bottom-right">
+            <div className="flex justify-between items-center mb-4 border-b border-gray-800 pb-3">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-[#00C951]" />
+                <h3 className="text-sm font-bold text-white font-sans">Demo Credentials</h3>
+              </div>
+              <button
+                onClick={() => setShowDemoPopup(false)}
+                className="text-gray-400 hover:text-white transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="flex flex-col gap-4">
+              {/* Manager Account */}
+              <div className="bg-[#121212]/80 border border-gray-800 hover:border-[#00C951]/30 rounded-xl p-3 transition-colors">
+                <div className="flex justify-between items-start mb-1">
+                  <span className="text-[10px] bg-[#00C951]/10 border border-[#00C951]/20 text-[#00C951] px-2 py-0.5 rounded-full font-medium">
+                    Manager Role
+                  </span>
+                  <span className="text-[9px] text-gray-500 font-mono">Full Access</span>
+                </div>
+                <div className="text-xs text-gray-300 font-mono break-all mt-1.5 select-all">
+                  demo-manager@example.com
+                </div>
+                <div className="text-[11px] text-gray-500 font-mono mt-0.5">
+                  Password: password
+                </div>
+                <div className="flex gap-2 mt-3">
+                  <button
+                    onClick={() => handleAutofill("demo-manager@example.com", "password")}
+                    className="flex-1 bg-[#00C951] text-black font-semibold py-1 rounded-md text-[10px] hover:bg-[#00b348] transition-colors cursor-pointer text-center"
+                  >
+                    Autofill
+                  </button>
+                  <button
+                    onClick={() => handleCopy("demo-manager@example.com", "manager")}
+                    className="bg-gray-800 border border-gray-700 text-gray-300 p-1.5 rounded-md hover:bg-gray-700 transition-colors cursor-pointer flex items-center justify-center"
+                    title="Copy email"
+                  >
+                    {copiedKey === "manager" ? (
+                      <Check className="w-3.5 h-3.5 text-[#00C951]" />
+                    ) : (
+                      <Copy className="w-3.5 h-3.5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Standard User Account */}
+              <div className="bg-[#121212]/80 border border-gray-800 hover:border-[#00C951]/30 rounded-xl p-3 transition-colors">
+                <div className="flex justify-between items-start mb-1">
+                  <span className="text-[10px] bg-blue-500/10 border border-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full font-medium">
+                    Standard User
+                  </span>
+                  <span className="text-[9px] text-gray-500 font-mono">View Only</span>
+                </div>
+                <div className="text-xs text-gray-300 font-mono break-all mt-1.5 select-all">
+                  demo-user@example.com
+                </div>
+                <div className="text-[11px] text-gray-500 font-mono mt-0.5">
+                  Password: password
+                </div>
+                <div className="flex gap-2 mt-3">
+                  <button
+                    onClick={() => handleAutofill("demo-user@example.com", "password")}
+                    className="flex-1 bg-blue-500 text-white font-semibold py-1 rounded-md text-[10px] hover:bg-blue-600 transition-colors cursor-pointer text-center"
+                  >
+                    Autofill
+                  </button>
+                  <button
+                    onClick={() => handleCopy("demo-user@example.com", "user")}
+                    className="bg-gray-800 border border-gray-700 text-gray-300 p-1.5 rounded-md hover:bg-gray-700 transition-colors cursor-pointer flex items-center justify-center"
+                    title="Copy email"
+                  >
+                    {copiedKey === "user" ? (
+                      <Check className="w-3.5 h-3.5 text-blue-400" />
+                    ) : (
+                      <Copy className="w-3.5 h-3.5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -58,6 +58,14 @@ const componentSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    isDemo: {
+      type: Boolean,
+      default: false,
+    },
+    createdBy: {
+      type: String,
+      default: "system",
+    },
   },
   { timestamps: true }
 );

@@ -158,11 +158,12 @@ const searchComponentsWithPaginationService = async (
     },
   ]);
 
+  const total = result[0].totalCount[0]?.count || 0;
   const totalPages = Math.ceil(total / parsedLimit);
 
   return {
     data: result[0].data,
-    total: result[0].totalCount[0]?.count || 0,
+    total,
     totalPages,
     page: parsedPage,
     limit: parsedLimit,
