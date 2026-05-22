@@ -144,7 +144,7 @@ export default function AddComponentModal({ isOpen, onClose, onSuccess }) {
           </button>
         </div>
 
-        <div className="overflow-y-auto p-4 sm:p-6 custom-scrollbar">
+        <div className="overflow-y-auto p-4 sm:p-6 no-scrollbar">
           <form
             onSubmit={handleSubmit}
             className="flex flex-col gap-4 sm:gap-5"

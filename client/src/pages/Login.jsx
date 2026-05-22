@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { Lock, Mail, User as UserIcon, AlertTriangle, Key, Copy, Check, X, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import SEO from "../components/SEO";
 
 export default function Login() {
   const { login } = useAuth();
@@ -82,6 +83,11 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-[#121212] flex items-center justify-center p-4 font-sans text-gray-200">
+      <SEO
+        title={isRegistering ? "Create Account" : "Sign In"}
+        description="Sign in or register to access the Evolve Lab Inventory management system. Track, manage, and request robotics components."
+        keywords="lab login, inventory access, robotics database, request components portal"
+      />
       <div className="bg-[#1A1A1A] border border-gray-800 rounded-2xl shadow-2xl w-full max-w-md p-6 sm:p-8 max-h-screen overflow-y-auto custom-scrollbar">
         <div className="text-center mb-6 sm:mb-8 mt-2 sm:mt-0">
           <div className="w-10 h-10 sm:w-12 sm:h-12 bg-[#00C951]/10 rounded-xl flex items-center justify-center mx-auto mb-4 border border-[#00C951]/20">

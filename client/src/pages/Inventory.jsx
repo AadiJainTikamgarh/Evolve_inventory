@@ -13,6 +13,7 @@ import DeleteModal from "../components/DeleteModal";
 import BorrowModal from "../components/BorrowModal";
 import ComponentDetailsModal from "../components/ComponentDetailsModal";
 import { useAuth } from "../context/AuthContext";
+import SEO from "../components/SEO";
 
 export default function Inventory() {
   const { user } = useAuth();
@@ -147,6 +148,11 @@ export default function Inventory() {
 
   return (
     <div className="text-gray-200 font-sans max-w-7xl mx-auto relative px-2 sm:px-0">
+      <SEO
+        title="Components Inventory"
+        description="Search, view, and manage laboratory component items including microcontrollers, motor drivers, sensors, and power supplies."
+        keywords="lab components, robotics hardware, view inventory, components search, microcontroller catalog"
+      />
       <div className="mb-4 sm:mb-6">
         <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight mb-1">
           Components
@@ -189,7 +195,7 @@ export default function Inventory() {
         </div>
       </div>
 
-      <div className="bg-[#1A1A1A] border border-gray-800 rounded-xl overflow-x-auto shadow-sm custom-scrollbar">
+      <div className="bg-[#1A1A1A] border border-gray-800 rounded-xl overflow-x-auto shadow-sm no-scrollbar">
         <table className="w-full text-left border-collapse min-w-200">
           <thead>
             <tr className="border-b border-gray-800 text-[10px] sm:text-xs font-semibold text-white uppercase tracking-wider">

@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
 import { Box, Hash, Layers, Activity } from "lucide-react";
+import SEO from "../components/SEO";
 import { motion } from "framer-motion";
 import {
   BarChart,
@@ -127,6 +128,11 @@ export default function LabOverview() {
       animate="show"
       className="text-gray-200 font-sans max-w-7xl mx-auto space-y-3.5 p-4 md:px-6 md:py-0"
     >
+      <SEO
+        title="Lab Overview"
+        description="Get a real-time high-level view of your robotics lab stock. Track unique components, physical quantities, category distributions, and items currently borrowed."
+        keywords="lab dashboard, robotics overview, inventory stats, active components, categories list"
+      />
       {/* Header Section */}
       <motion.div variants={itemVariants}>
         <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight mb-1">

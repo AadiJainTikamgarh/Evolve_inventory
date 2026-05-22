@@ -101,7 +101,7 @@ export default function Layout() {
           NAVIGATION
         </div>
 
-        <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
+        <nav className="flex-1 px-4 space-y-1 overflow-y-auto no-scrollbar">
           {navLinks
             .filter((link) => link.roles.includes(userRole.toLowerCase()))
             .map((link) => {
@@ -201,7 +201,7 @@ export default function Layout() {
           </div>
         )}
 
-        <div className="flex-1 p-4 md:p-8 overflow-y-auto">
+        <div className="flex-1 p-4 md:p-8 overflow-y-auto no-scrollbar">
           <Outlet />
         </div>
       </main>
